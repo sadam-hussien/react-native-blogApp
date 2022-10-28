@@ -13,7 +13,7 @@ import {colors, sizes} from "@/constants";
 
 import {useSelector, useDispatch} from "react-redux";
 
-import {action_add_to_fav} from "@/store/favReducer";
+import {action_add_to_fav, action_remove_from_fav} from "@/store/favReducer";
 
 const BlogItem = ({data}) => {
   if (data) {
@@ -34,30 +34,33 @@ const BlogItem = ({data}) => {
 function Item({data}) {
   const dispatch = useDispatch();
   const favItems = useSelector(state => state.fav);
-  const checkIfCurrentItemInFav = favItems.items.find(
+  const checkIfCurrentItemInFav = favItems.items?.find(
     item => item.ItemID === data.ItemID,
   );
-  console.log(checkIfCurrentItemInFav);
-
   const addToFav = () => {
     dispatch(action_add_to_fav(data));
+  };
+  const removeFromFav = () => {
+    dispatch(action_remove_from_fav(data));
   };
   return (
     <View style={styles.itemContainer}>
       <Text>{data.Title_en}</Text>
-      <TouchableOpacity onPress={addToFav} style={styles.favBtn}>
-        {checkIfCurrentItemInFav ? (
+      {checkIfCurrentItemInFav ? (
+        <TouchableOpacity onPress={removeFromFav}>
           <Image
             source={require("@/assets/imgs/heart-fill.png")}
             style={styles.faveImg}
           />
-        ) : (
+        </TouchableOpacity>
+      ) : (
+        <TouchableOpacity onPress={addToFav}>
           <Image
             source={require("@/assets/imgs/heart.png")}
             style={styles.faveImg}
           />
-        )}
-      </TouchableOpacity>
+        </TouchableOpacity>
+      )}
     </View>
   );
 }

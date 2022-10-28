@@ -1,31 +1,21 @@
-import {View, Text, StyleSheet, FlatList, Image} from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
+  Image,
+} from "react-native";
 
-import React, {useEffect, useState, useCallback, useMemo} from "react";
+import React from "react";
 
-import {content_data} from "@/data";
+import {colors, sizes} from "@/constants";
 
-import {colors, fonts, sizes} from "@/constants";
+import {useSelector, useDispatch} from "react-redux";
+
+import {action_add_to_fav} from "@/store/favReducer";
 
 const BlogItem = ({data}) => {
-  // first you should get dynamic item
-  // you have the data props -> get the id and get the data based on this id
-  // i make this static but you get the data from api
-  // const [isLoading, setIsLoading] = useState(true);
-
-  // useEffect(() => {
-  //   const loadingTimeout = setTimeout(() => setIsLoading(false), 200);
-  //   return () => {
-  //     clearTimeout(loadingTimeout);
-  //   };
-  // }, []);
-
-  // if (isLoading) {
-  //   return (
-  //     <View>
-  //       <Text>loading,,,</Text>
-  //     </View>
-  //   );
-  // }
   if (data) {
     return (
       <View style={styles.container}>
@@ -42,9 +32,32 @@ const BlogItem = ({data}) => {
 };
 
 function Item({data}) {
+  const dispatch = useDispatch();
+  const favItems = useSelector(state => state.fav);
+  const checkIfCurrentItemInFav = favItems.items.find(
+    item => item.ItemID === data.ItemID,
+  );
+  console.log(checkIfCurrentItemInFav);
+
+  const addToFav = () => {
+    dispatch(action_add_to_fav(data));
+  };
   return (
     <View style={styles.itemContainer}>
       <Text>{data.Title_en}</Text>
+      <TouchableOpacity onPress={addToFav} style={styles.favBtn}>
+        {checkIfCurrentItemInFav ? (
+          <Image
+            source={require("@/assets/imgs/heart-fill.png")}
+            style={styles.faveImg}
+          />
+        ) : (
+          <Image
+            source={require("@/assets/imgs/heart.png")}
+            style={styles.faveImg}
+          />
+        )}
+      </TouchableOpacity>
     </View>
   );
 }
@@ -67,6 +80,11 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
     borderRadius: 10,
+  },
+  favBtn: {},
+  faveImg: {
+    maxHeight: 50,
+    maxWidth: 50,
   },
 });
 

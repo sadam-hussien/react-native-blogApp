@@ -11,17 +11,22 @@ import React, {useState, useEffect} from "react";
 
 import {sizes, colors, fonts} from "@/constants";
 
-import {tabs_data} from "@/data";
-
 import {BlogItem} from "@/components";
 
 import {TabView} from "react-native-tab-view";
 
 import axios from "axios";
 
+import {PersistGate} from "redux-persist/integration/react";
+
+import {Provider} from "react-redux";
+
+import store, {persistor} from "@/store";
+
 export default function App() {
   const [index, setIndex] = useState(0);
-  const [currentItem, setCurrentItem] = useState(null);
+
+  const [, setCurrentItem] = useState(null);
 
   const [routes, setRoutes] = useState([]);
 
@@ -68,7 +73,7 @@ export default function App() {
           data={ourRoutes}
           horizontal
           showsHorizontalScrollIndicator={false}
-          keyExtractor={item => item.categoryID}
+          keyExtractor={item => item.CategoryID}
           contentContainerStyle={styles.tabContainer}
           renderItem={({item, index: idx}) => {
             const opacity = props.position.interpolate({
@@ -113,15 +118,19 @@ export default function App() {
   }
 
   return (
-    <TabView
-      navigationState={{index, routes}}
-      renderScene={({route}) => {
-        return <BlogItem data={content} />;
-      }}
-      onIndexChange={setIndex}
-      renderTabBar={renderTabBar}
-      initialLayout={{width: sizes.width}}
-    />
+    <Provider store={store}>
+      <PersistGate loading={<Text>Loading...</Text>} persistor={persistor}>
+        <TabView
+          navigationState={{index, routes}}
+          renderScene={({route}) => {
+            return <BlogItem data={content} />;
+          }}
+          onIndexChange={setIndex}
+          renderTabBar={renderTabBar}
+          initialLayout={{width: sizes.width}}
+        />
+      </PersistGate>
+    </Provider>
   );
 }
 
